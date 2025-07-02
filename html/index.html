@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inmobiliaria</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .property {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            background-color: white;
+            transition: transform 0.2s;
+        }
+        .property:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        #loading {
+            text-align: center;
+            color: #666;
+            padding: 20px;
+        }
+        .error {
+            color: #e74c3c;
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Inmobiliaria - Propiedades Disponibles</h1>
+        <div id="loading">Cargando propiedades...</div>
+        <div id="properties"></div>
+    </div>
+
+    <script>
+        async function loadProperties() {
+            const loadingElement = document.getElementById('loading');
+            const propertiesContainer = document.getElementById('properties');
+
+            try {
+                const response = await fetch('http://localhost:5001/api/propiedades');
+                const properties = await response.json();
+                
+                loadingElement.style.display = 'none';
+                
+                if (properties.length === 0) {
+                    propertiesContainer.innerHTML = '<div class="error">No hay propiedades disponibles</div>';
+                    return;
+                }
+
+                properties.forEach(property => {
+                    const propertyDiv = document.createElement('div');
+                    propertyDiv.className = 'property';
+                    propertyDiv.innerHTML = `
+                        <h2>Propiedad #${property.id}</h2>
+                        <p><strong>Dirección:</strong> ${property.direccion}</p>
+                    `;
+                    propertiesContainer.appendChild(propertyDiv);
+                });
+            } catch (error) {
+                console.error('Error:', error);
+                loadingElement.style.display = 'none';
+                propertiesContainer.innerHTML = '<div class="error">Error al cargar las propiedades. Por favor, intente más tarde.</div>';
+            }
+        }
+
+        window.onload = loadProperties;
+    </script>
+</body>
+</html> 
